@@ -1,16 +1,12 @@
 package pdf
 
 import (
-	"github.com/morsby/billedvaeg/images"
+	"fmt"
+
+	"github.com/morsby/billedvaeg"
 	"github.com/phpdave11/gofpdf"
 	"golang.org/x/text/encoding/charmap"
 )
-
-type Person struct {
-	Name     string
-	Position string
-	Img      string
-}
 
 var margin = 20.0
 var cellspacing = 5.0
@@ -23,7 +19,7 @@ func New() *gofpdf.Fpdf {
 	return pdf
 }
 
-func AddPeople(pdf *gofpdf.Fpdf, people []Person) {
+func AddPeople(pdf *gofpdf.Fpdf, people []billedvaeg.Person) {
 	for n, p := range people {
 		if n%6 == 0 {
 			pdf.AddPage()
@@ -35,31 +31,28 @@ func AddPeople(pdf *gofpdf.Fpdf, people []Person) {
 		}
 		pdf.SetX(x)
 
-		y := margin + float64(n%6/2*80)
+		y := margin + float64(n%6/2*85)
 		pdf.SetY(y)
 
-		name, err := enc.String(p.Name)
-		if err != nil {
-			panic(err)
-		}
-		pos, err := enc.String(p.Position)
-		if err != nil {
-			panic(err)
-		}
-		imgPath, err := images.CropImage("data/" + p.Img)
-		if err != nil {
-			panic(err)
-		}
-		img := pdf.RegisterImageOptions(imgPath, gofpdf.ImageOptions{})
+		img := pdf.RegisterImageOptions(p.Img, gofpdf.ImageOptions{})
 		w := img.Width() / (img.Height() / 60)
 
-		pdf.ImageOptions(imgPath, x+(cellWidth-w)/2, y, 0, 60, false, gofpdf.ImageOptions{}, 0, "")
+		pdf.ImageOptions(p.Img, x+(cellWidth-w)/2, y, 0, 60, false, gofpdf.ImageOptions{}, 0, "")
 		pdf.Ln(60)
-		pdf.SetX(x)
-		pdf.CellFormat(cellWidth, 6, name, "0", 0, "C", false, 0, "")
-		pdf.Ln(-1)
-		pdf.SetX(x)
-		pdf.CellFormat(cellWidth, 6, pos, "0", 0, "C", false, 0, "")
-		pdf.Ln(-1)
+
+		addTextLine(pdf, p.Name, x)
+		addTextLine(pdf, p.Position, x)
+		addTextLine(pdf, fmt.Sprintf("Vejleder: %s", p.Mentor), x)
+
 	}
+}
+
+func addTextLine(pdf *gofpdf.Fpdf, text string, x float64) {
+	encString, err := enc.String(text)
+	if err != nil {
+		panic(err)
+	}
+	pdf.SetX(x)
+	pdf.CellFormat(cellWidth, 6, encString, "0", 0, "C", false, 0, "")
+	pdf.Ln(-1)
 }
