@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billedvæg</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 80vw;
+        margin: auto;
+      }
+
+      #main {
+        flex: 1;
+        margin-top: 5%;
+      }
+
+      input {
+        display: block;
+      }
+
+      input[type="submit"] {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="main">
+        <h1>Billedvæg</h1>
+        <p>Her på siden kan du vælge et antal billeder og generere en billedvæg.</p>
+
+        <p>
+          Vælg de billeder, du vil have med i filen, og tryk "Upload" for at få din
+          billedvægs-fil
+        </p>
+        <form action="/" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" multiple="multiple" />
+          <input id="submit" type="submit" value="Upload" />
+        </form>
+      </div>
+      <footer>
+        <p>
+          Lavet af læge Sigurd Morsby Larsen, uddannelseskoordinerende yngre læge,
+          Neurologi, Aarhus Universitetshospital
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

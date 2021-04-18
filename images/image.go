@@ -47,7 +47,8 @@ func cropImage(filepath string) (string, error) {
 
 // ReadDir reads a dir and takes all images in it, converts them to a
 // []Person
-func ReadDir(dir string) (ppl []billedvaeg.Person, err error) {
+func ReadDir(dir string) (*billedvaeg.PersonList, error) {
+	var ppl billedvaeg.PersonList
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -77,10 +78,10 @@ func ReadDir(dir string) (ppl []billedvaeg.Person, err error) {
 			Img:      imgPath,
 		}
 
-		ppl = append(ppl, person)
+		ppl = append(ppl, &person)
 	}
 
-	return ppl, nil
+	return &ppl, nil
 }
 
 // RemoveTmpFiles deletes all created cropped images
@@ -101,4 +102,9 @@ func RemoveTmpFiles(dir string) error {
 		}
 	}
 	return nil
+}
+
+// RemoveTmpDir deletes the given directory and all contents
+func RemoveTmpDir(dir string) error {
+	return os.RemoveAll(dir)
 }

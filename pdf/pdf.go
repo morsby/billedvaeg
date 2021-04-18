@@ -19,7 +19,7 @@ func New() *gofpdf.Fpdf {
 	return pdf
 }
 
-func AddPeople(pdf *gofpdf.Fpdf, people []billedvaeg.Person) {
+func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList) {
 	for n, p := range people {
 		if n%6 == 0 {
 			pdf.AddPage()
@@ -43,7 +43,6 @@ func AddPeople(pdf *gofpdf.Fpdf, people []billedvaeg.Person) {
 		addTextLine(pdf, p.Name, x)
 		addTextLine(pdf, p.Position, x)
 		addTextLine(pdf, fmt.Sprintf("Vejleder: %s", p.Mentor), x)
-
 	}
 }
 
