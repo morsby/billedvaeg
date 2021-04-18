@@ -2,6 +2,7 @@ package images
 
 import (
 	"errors"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"os"
@@ -47,7 +48,7 @@ func cropImage(filepath string) (string, error) {
 
 // ReadDir reads a dir and takes all images in it, converts them to a
 // []Person
-func ReadDir(dir string) (*billedvaeg.PersonList, error) {
+func ReadDir(dir string, special bool) (*billedvaeg.PersonList, error) {
 	var ppl billedvaeg.PersonList
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -71,10 +72,17 @@ func ReadDir(dir string) (*billedvaeg.PersonList, error) {
 			return nil, err
 		}
 
+		suppl := ""
+		if special {
+			suppl = strings.Replace(data[2], "-", "/", -1)
+		} else {
+			suppl = fmt.Sprintf("Vejleder: %s", data[2])
+		}
+
 		person := billedvaeg.Person{
 			Name:     data[0],
-			Position: data[1],
-			Mentor:   data[2],
+			Position: billedvaeg.Positions[data[1]],
+			Suppl:    suppl,
 			Img:      imgPath,
 		}
 

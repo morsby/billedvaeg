@@ -47,7 +47,8 @@
           billedvægs-fil
         </p>
         <form action="/" method="POST" enctype="multipart/form-data">
-          <input type="file" name="file" multiple="multiple" />
+          <input type="file" name="file" multiple="multiple" accept="image/*" />
+          <input type="checkbox" name="special" /> Speciallæger?
           <input id="submit" type="submit" value="Upload" />
         </form>
       </div>

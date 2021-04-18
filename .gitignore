@@ -1,5 +1,6 @@
 *.pdf
 *_cropped.jpg
+tmp/
 # Created by https://www.toptal.com/developers/gitignore/api/go,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,macos
 

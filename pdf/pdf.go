@@ -1,37 +1,35 @@
 package pdf
 
 import (
-	"fmt"
-
 	"github.com/morsby/billedvaeg"
 	"github.com/phpdave11/gofpdf"
-	"golang.org/x/text/encoding/charmap"
 )
 
 var margin = 20.0
 var cellspacing = 5.0
-var cellWidth = (210-margin*2)/2 - cellspacing
-var enc = charmap.Windows1252.NewEncoder()
 
 func New() *gofpdf.Fpdf {
 	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.SetFont("Arial", "", 12)
+
+	pdf.SetFont("Times", "", 11)
 	return pdf
 }
 
-func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList) {
+func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList, cols int) {
+	rows := 3
+	pplPerPage := rows * cols
+	var cellWidth = (210-margin*2)/float64(cols) - cellspacing
+
 	for n, p := range people {
-		if n%6 == 0 {
+		if n%pplPerPage == 0 {
 			pdf.AddPage()
 		}
 
-		x := margin
-		if n%2 == 1 {
-			x += cellWidth + cellspacing*2
-		}
+		x := margin + (cellWidth+cellspacing*2)*float64(n%cols)
+
 		pdf.SetX(x)
 
-		y := margin + float64(n%6/2*85)
+		y := margin + float64(n%pplPerPage/cols*85)
 		pdf.SetY(y)
 
 		img := pdf.RegisterImageOptions(p.Img, gofpdf.ImageOptions{})
@@ -40,18 +38,16 @@ func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList) {
 		pdf.ImageOptions(p.Img, x+(cellWidth-w)/2, y, 0, 60, false, gofpdf.ImageOptions{}, 0, "")
 		pdf.Ln(60)
 
-		addTextLine(pdf, p.Name, x)
-		addTextLine(pdf, p.Position, x)
-		addTextLine(pdf, fmt.Sprintf("Vejleder: %s", p.Mentor), x)
+		addTextLine(pdf, p.Name, x, cellWidth)
+		addTextLine(pdf, p.Position.Title, x, cellWidth)
+		addTextLine(pdf, p.Suppl, x, cellWidth)
 	}
 }
 
-func addTextLine(pdf *gofpdf.Fpdf, text string, x float64) {
-	encString, err := enc.String(text)
-	if err != nil {
-		panic(err)
-	}
+func addTextLine(pdf *gofpdf.Fpdf, text string, x float64, cellWidth float64) {
+	toUTF8 := pdf.UnicodeTranslatorFromDescriptor("")
+
 	pdf.SetX(x)
-	pdf.CellFormat(cellWidth, 6, encString, "0", 0, "C", false, 0, "")
+	pdf.CellFormat(cellWidth, 6, toUTF8(text), "0", 0, "C", false, 0, "")
 	pdf.Ln(-1)
 }

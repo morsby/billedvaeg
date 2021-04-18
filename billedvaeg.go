@@ -7,8 +7,8 @@ import (
 // Person contains information on a doctor
 type Person struct {
 	Name     string
-	Position string
-	Mentor   string
+	Position Position
+	Suppl    string
 	Img      string
 }
 
@@ -24,24 +24,29 @@ const (
 	Ps
 )
 
-var positions = map[string]int{
-	"LO":  LO,
-	"UAO": UAO,
-	"OL":  OL,
-	"AL":  AL,
-	"HU":  HU,
-	"I":   I,
-	"Ps":  Ps,
+type Position struct {
+	Title string
+	Value int
+}
+
+var Positions = map[string]Position{
+	"LO":  {"Ledende overlæge", LO},
+	"UAO": {"Uddannelsesansvarlig overlæge", UAO},
+	"OL":  {"Overlæge", OL},
+	"AL":  {"Afdelingslæge", AL},
+	"HU":  {"HU Neurologi", HU},
+	"I":   {"Introduktionslæge", I},
+	"Ps":  {"HU Psykiatri", Ps},
 }
 
 func (ppl PersonList) Sort() {
 	sort.Slice(ppl, func(i, j int) bool {
 		// Same positions, sort by name instead
-		if positions[ppl[i].Position] == positions[ppl[j].Position] {
+		if ppl[i].Position.Value == ppl[j].Position.Value {
 			return ppl[i].Name < ppl[j].Name
 		}
 
 		// sort by name
-		return positions[ppl[i].Position] < positions[ppl[j].Position]
+		return ppl[i].Position.Value < ppl[j].Position.Value
 	})
 }

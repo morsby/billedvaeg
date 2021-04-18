@@ -55,7 +55,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		// a specified value, use the http.MaxBytesReader() method
 		// before calling ParseMultipartForm()
 		if fileHeader.Size > MAX_UPLOAD_SIZE {
-			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 1MB in size", fileHeader.Filename), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("The uploaded image is too big: %s. Please use an image less than 5MB in size", fileHeader.Filename), http.StatusBadRequest)
 			return
 		}
 
@@ -109,16 +109,17 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	ppl, err := images.ReadDir(imgFolder)
+	special := r.FormValue("special") == "on"
+
+	ppl, err := images.ReadDir(imgFolder, special)
 	defer images.RemoveTmpDir(imgFolder)
 	ppl.Sort()
-
 	if err != nil {
 		panic(err)
 	}
 
 	doc := pdf.New()
-	pdf.AddPeople(doc, *ppl)
+	pdf.AddPeople(doc, *ppl, 3)
 
 	if err != nil {
 		panic(err)
