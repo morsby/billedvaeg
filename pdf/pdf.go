@@ -1,6 +1,8 @@
 package pdf
 
 import (
+	"strings"
+
 	"github.com/morsby/billedvaeg"
 	"github.com/phpdave11/gofpdf"
 )
@@ -11,7 +13,7 @@ var cellspacing = 5.0
 func New() *gofpdf.Fpdf {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 
-	pdf.SetFont("Times", "", 11)
+	pdf.SetFont("Arial", "", 11)
 	return pdf
 }
 
@@ -46,6 +48,10 @@ func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList, cols int) {
 
 func addTextLine(pdf *gofpdf.Fpdf, text string, x float64, cellWidth float64) {
 	toUTF8 := pdf.UnicodeTranslatorFromDescriptor("")
+
+	// weird encoding fixes...
+	text = strings.Replace(text, "ü", "ü", -1)
+	text = strings.Replace(text, "å", "å", -1)
 
 	pdf.SetX(x)
 	pdf.CellFormat(cellWidth, 6, toUTF8(text), "0", 0, "C", false, 0, "")

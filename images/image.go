@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/morsby/billedvaeg"
+	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
 
@@ -35,6 +36,8 @@ func cropImage(filepath string) (string, error) {
 		Options: cutter.Ratio,
 	})
 
+	cImg = resize.Thumbnail(15*60, 0, cImg, resize.Lanczos2)
+
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +45,7 @@ func cropImage(filepath string) (string, error) {
 	newFile := basepath + "_cropped.jpg"
 	out, _ := os.Create(newFile)
 	defer out.Close()
-	jpeg.Encode(out, cImg, &jpeg.Options{Quality: 100})
+	jpeg.Encode(out, cImg, &jpeg.Options{Quality: 75})
 	return newFile, nil
 }
 
