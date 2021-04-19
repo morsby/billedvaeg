@@ -1,7 +1,6 @@
 package images
 
 import (
-	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -68,7 +67,7 @@ func ReadDir(dir string, special bool, formValues map[string][]string) (*billedv
 		basepath := strings.TrimSuffix(file.Name(), path.Ext(file.Name()))
 		data := strings.Split(basepath, "_")
 		if len(data) != 3 {
-			return nil, errors.New("Unable to parse filename " + file.Name())
+			data = []string{"", "", ""}
 		}
 		imgPath, err := cropImage(dir + "/" + file.Name())
 		if err != nil {

@@ -12,6 +12,19 @@
         height: 100%;
         margin: 0;
         padding: 0;
+        font-size: 14pt;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      input,
+      select {
+        font-size: inherit;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      code {
+        color: rgb(216, 39, 39);
+        background-color: rgb(228, 227, 227);
       }
 
       #wrapper {
@@ -41,6 +54,11 @@
         order: 2;
       }
 
+      .person-inputs div {
+        display: grid;
+        grid-template-columns: 16ch auto;
+      }
+
       input[type="submit"] {
         margin-top: 2rem;
       }
@@ -53,9 +71,38 @@
         <p>Her på siden kan du vælge et antal billeder og generere en billedvæg.</p>
 
         <p>
-          Vælg de billeder, du vil have med i filen, og tryk "Upload" for at få din
-          billedvægs-fil
+          Vælg de billeder, du vil have med i filen, og tryk på knappen nederst for at få
+          din billedvægs-fil
         </p>
+
+        <p>
+          Systemet prøver at "gætte" på folks oplsyninger, hvis filerne er navngivet efter
+          formen <code>NAVN_STILLING_SUPPLERENDE.jpg</code>, hvor <code>STILLING</code> er
+          en af følgende:
+        </p>
+
+        <ul>
+          <li><code>LO</code> = ledende overlæge</li>
+          <li><code>UAO</code> = Uddannelsesansvarlig overlæge</li>
+          <li><code>OL</code> = Overlæge</li>
+          <li><code>AL</code> = Afdelingslæge</li>
+          <li><code>HU</code> = HU Neurologi</li>
+          <li><code>I</code> = Introduktionslæge</li>
+          <li><code>Ps</code> = HU Psyk</li>
+        </ul>
+
+        <p>
+          Hvis filerne er navngivet anderledes, kan det rettes til i formularen, der
+          dukker op.
+        </p>
+
+        <p>
+          Man skal være opmærksom på "specielle" tegn (fx æ, ø, å, ü, ä mv.), som er
+          blevet udledt af filnavnet - de kan evt. give vanskeligheder i den genererede
+          PDF, selvom de umiddelbart vises korrekt i formularen. Her kan det hjælp at
+          skrive det manuelt i formularen.
+        </p>
+
         <form action="/" method="POST" enctype="multipart/form-data">
           <input
             type="file"
@@ -64,7 +111,9 @@
             accept="image/*"
             onchange="load(this)"
           />
-          <input type="checkbox" name="special" /> Speciallæger?
+          <br />
+          <input type="checkbox" name="special" id="special" />
+          <label for="special">Speciallæger?</label>
           <div id="images"></div>
           <input id="submit" type="submit" value="Lav billedvæg" />
         </form>
@@ -101,6 +150,11 @@
 
     function createMetadata(string) {
       const parts = string.split("_");
+
+      if (parts.length != 3) {
+        return { name: "", position: "", suppl: "" };
+      }
+
       return {
         name: parts[0],
         position: parts[1],
@@ -132,7 +186,7 @@
         ["id", name],
       ]);
       input.appendChild(
-        createEl("option", "Ledende verlæge", [
+        createEl("option", "Ledende overlæge", [
           ["value", "LO"],
           ["selected", "LO" === value ? "true" : null],
         ])
@@ -201,7 +255,7 @@
         };
         reader.readAsDataURL(files[n]);
 
-        const div = createEl("div");
+        const div = createEl("div", null, [["class", "person-inputs"]]);
         div.appendChild(createInput(person.name, files[n].name + "-name", "Navn"));
         div.appendChild(
           createPositionsDropdown(person.position, files[n].name + "-position")
