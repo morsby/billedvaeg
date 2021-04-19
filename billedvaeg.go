@@ -16,6 +16,7 @@ type PersonList []*Person
 
 const (
 	LO = iota
+	OLPro
 	UAO
 	OL
 	AL
@@ -30,13 +31,14 @@ type Position struct {
 }
 
 var Positions = map[string]Position{
-	"LO":  {"Ledende overlæge", LO},
-	"UAO": {"Uddannelsesansvarlig overlæge", UAO},
-	"OL":  {"Overlæge", OL},
-	"AL":  {"Afdelingslæge", AL},
-	"HU":  {"HU Neurologi", HU},
-	"I":   {"Introduktionslæge", I},
-	"Ps":  {"HU Psykiatri", Ps},
+	"LO":     {"Ledende overlæge", LO},
+	"OL-Pro": {"Overlæge, professor", OLPro},
+	"UAO":    {"Uddannelsesansvarlig overlæge", UAO},
+	"OL":     {"Overlæge", OL},
+	"AL":     {"Afdelingslæge", AL},
+	"HU":     {"HU Neurologi", HU},
+	"I":      {"Introduktionslæge", I},
+	"Ps":     {"HU Psykiatri", Ps},
 }
 
 func (ppl PersonList) Sort() {

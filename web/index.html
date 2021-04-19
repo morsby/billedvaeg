@@ -76,13 +76,14 @@
         </p>
 
         <p>
-          Systemet prøver at "gætte" på folks oplsyninger, hvis filerne er navngivet efter
+          Systemet prøver at "gætte" på folks oplysninger, hvis filerne er navngivet efter
           formen <code>NAVN_STILLING_SUPPLERENDE.jpg</code>, hvor <code>STILLING</code> er
           en af følgende:
         </p>
 
         <ul>
           <li><code>LO</code> = ledende overlæge</li>
+          <li><code>OL-Pro</code> = Overlæge, professor</li>
           <li><code>UAO</code> = Uddannelsesansvarlig overlæge</li>
           <li><code>OL</code> = Overlæge</li>
           <li><code>AL</code> = Afdelingslæge</li>
@@ -90,6 +91,13 @@
           <li><code>I</code> = Introduktionslæge</li>
           <li><code>Ps</code> = HU Psyk</li>
         </ul>
+
+        <p>
+          og <code>SUPPLERENDE</code> for yngre læger er deres vejleders navn/initialer og
+          for speciallæger er subspeciale. Ønskes andet end vejlederen for yngre læger,
+          kan der vinges af i <code>special</code>-checkboxen, så der ikke tilføjes
+          teksten "Vejleder: " forrest i feltet, når PDF'en laves.
+        </p>
 
         <p>
           Hvis filerne er navngivet anderledes, kan det rettes til i formularen, der
@@ -189,6 +197,12 @@
         createEl("option", "Ledende overlæge", [
           ["value", "LO"],
           ["selected", "LO" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "Overlæge, professor", [
+          ["value", "OL-Pro"],
+          ["selected", "OL-Pro" === value ? "true" : null],
         ])
       );
       input.appendChild(
