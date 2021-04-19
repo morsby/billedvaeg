@@ -27,8 +27,18 @@
         margin-top: 5%;
       }
 
-      input {
-        display: block;
+      fieldset {
+        display: flex;
+      }
+
+      fieldset img {
+        order: 1;
+        margin-right: 1rem;
+      }
+
+      fieldset div {
+        flex: 1;
+        order: 2;
       }
 
       input[type="submit"] {
@@ -47,9 +57,16 @@
           billedvægs-fil
         </p>
         <form action="/" method="POST" enctype="multipart/form-data">
-          <input type="file" name="file" multiple="multiple" accept="image/*" />
+          <input
+            type="file"
+            name="file"
+            multiple="multiple"
+            accept="image/*"
+            onchange="load(this)"
+          />
           <input type="checkbox" name="special" /> Speciallæger?
-          <input id="submit" type="submit" value="Upload" />
+          <div id="images"></div>
+          <input id="submit" type="submit" value="Lav billedvæg" />
         </form>
       </div>
       <footer>
@@ -60,4 +77,145 @@
       </footer>
     </div>
   </body>
+  <script>
+    // tag = element to create
+    // html = tag's html contents
+    // tags = [["attribute", "value"], ...]
+    function createEl(tag, html = null, tags = []) {
+      const el = document.createElement(tag);
+      el.innerHTML = html;
+      tags.forEach((tag) => {
+        if (
+          tag[0] === undefined ||
+          tag[0] === null ||
+          tag[1] === undefined ||
+          tag[1] === null
+        ) {
+          return;
+        }
+
+        el.setAttribute(tag[0], tag[1]);
+      });
+      return el;
+    }
+
+    function createMetadata(string) {
+      const parts = string.split("_");
+      return {
+        name: parts[0],
+        position: parts[1],
+        suppl: parts[2].replaceAll("-", "/").replace(/\.[^/.]+$/, ""), // trims extension,
+      };
+    }
+
+    function createInput(value, name, label) {
+      const div = createEl("div");
+      const labelEl = createEl("label", label + ": ");
+      labelEl.setAttribute("for", name);
+      const input = createEl("input", null, [
+        ["type", "text"],
+        ["value", value],
+        ["name", name],
+        ["id", name],
+      ]);
+      div.appendChild(labelEl);
+      div.appendChild(input);
+      return div;
+    }
+
+    function createPositionsDropdown(value, name) {
+      console.log({ name, value });
+      const div = createEl("div");
+      const labelEl = createEl("label", "Stilling: ");
+      labelEl.setAttribute("for", name);
+      const input = createEl("select", null, [
+        ["name", name],
+        ["id", name],
+      ]);
+      input.appendChild(
+        createEl("option", "Ledende verlæge", [
+          ["value", "LO"],
+          ["selected", "LO" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "Uddannelsesansvarlig", [
+          ["value", "UAO"],
+          ["selected", "UAO" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "Overlæge", [
+          ["value", "OL"],
+          ["selected", "OL" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "Afdelingslæge", [
+          ["value", "AL"],
+          ["selected", "AL" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "HU Neurologi", [
+          ["value", "HU"],
+          ["selected", "HU" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "Introduktionslæge", [
+          ["value", "I"],
+          ["selected", "I" === value ? "true" : null],
+        ])
+      );
+      input.appendChild(
+        createEl("option", "HU Psyk", [
+          ["value", "Ps"],
+          ["selected", "Ps" === value ? "true" : null],
+        ])
+      );
+
+      div.appendChild(labelEl);
+      div.appendChild(input);
+      return div;
+    }
+
+    function load(el) {
+      document.querySelector("#images").innerHTML = null;
+
+      const files = el.files;
+      const rows = createEl("div");
+      for (let n = 0; n < files.length; n++) {
+        const row = document.createElement("fieldset");
+        const person = createMetadata(files[n].name);
+
+        row.appendChild(createEl("legend", files[n].name));
+
+        const reader = new FileReader();
+        reader.onload = function () {
+          row.appendChild(
+            createEl("img", null, [
+              ["src", reader.result],
+              ["width", 100],
+            ])
+          );
+        };
+        reader.readAsDataURL(files[n]);
+
+        const div = createEl("div");
+        div.appendChild(createInput(person.name, files[n].name + "-name", "Navn"));
+        div.appendChild(
+          createPositionsDropdown(person.position, files[n].name + "-position")
+        );
+        div.appendChild(
+          createInput(person.suppl, files[n].name + "-suppl", "Supplerende")
+        );
+        row.appendChild(div);
+
+        rows.appendChild(row);
+      }
+
+      document.querySelector("#images").appendChild(rows);
+    }
+  </script>
 </html>

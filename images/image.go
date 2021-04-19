@@ -36,7 +36,7 @@ func cropImage(filepath string) (string, error) {
 		Options: cutter.Ratio,
 	})
 
-	cImg = resize.Thumbnail(15*60, 0, cImg, resize.Lanczos2)
+	cImg = resize.Resize(15*60, 0, cImg, resize.Lanczos3)
 
 	if err != nil {
 		return "", err

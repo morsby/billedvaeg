@@ -1,3 +1,3 @@
 # Billedvæeg
 
-`reflex -s -r '.*\.go|html$' go run cmd/main.go`
+`reflex -s -r '.*\.go|html$' -R 'tmp' go run cmd/main.go`
