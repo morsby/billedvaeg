@@ -51,7 +51,7 @@ func cropImage(filepath string) (string, error) {
 
 // ReadDir reads a dir and takes all images in it, converts them to a
 // []Person
-func ReadDir(dir string, special bool) (*billedvaeg.PersonList, error) {
+func ReadDir(dir string, special bool, formValues map[string][]string) (*billedvaeg.PersonList, error) {
 	var ppl billedvaeg.PersonList
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -75,16 +75,33 @@ func ReadDir(dir string, special bool) (*billedvaeg.PersonList, error) {
 			return nil, err
 		}
 
-		suppl := ""
-		if special {
-			suppl = strings.Replace(data[2], "-", "/", -1)
+		name := ""
+		if v, ok := formValues[file.Name()+"-name"]; ok {
+			name = v[0]
 		} else {
-			suppl = fmt.Sprintf("Vejleder: %s", data[2])
+			name = data[0]
+		}
+
+		var position billedvaeg.Position
+		if v, ok := formValues[file.Name()+"-position"]; ok {
+			position = billedvaeg.Positions[v[0]]
+		} else {
+			position = billedvaeg.Positions[data[1]]
+		}
+
+		suppl := ""
+		if v, ok := formValues[file.Name()+"-suppl"]; ok {
+			suppl = v[0]
+		} else {
+			suppl = strings.Replace(data[2], "-", "/", -1)
+		}
+		if !special {
+			suppl = fmt.Sprintf("Vejleder: %s", suppl)
 		}
 
 		person := billedvaeg.Person{
-			Name:     data[0],
-			Position: billedvaeg.Positions[data[1]],
+			Name:     name,
+			Position: position,
 			Suppl:    suppl,
 			Img:      imgPath,
 		}

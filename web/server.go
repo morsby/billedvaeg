@@ -110,9 +110,9 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 	special := r.FormValue("special") == "on"
-
-	ppl, err := images.ReadDir(imgFolder, special)
+	ppl, err := images.ReadDir(imgFolder, special, r.MultipartForm.Value)
 	defer images.RemoveTmpDir(imgFolder)
+
 	ppl.Sort()
 	if err != nil {
 		panic(err)
