@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billedvæg</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-size: 14pt;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      input,
+      select {
+        font-size: inherit;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      code {
+        color: rgb(216, 39, 39);
+        background-color: rgb(228, 227, 227);
+      }
+
+      #wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 80vw;
+        margin: auto;
+      }
+
+      #main {
+        flex: 1;
+        margin-top: 5%;
+      }
+
+      fieldset {
+        display: flex;
+      }
+
+      fieldset img {
+        order: 1;
+        margin-right: 1rem;
+      }
+
+      fieldset div {
+        flex: 1;
+        order: 2;
+      }
+
+      .person-inputs div {
+        display: grid;
+        grid-template-columns: 16ch auto;
+      }
+
+      input[type="submit"] {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="main">
+        <h1>Billedvæg</h1>
+        <p>Her på siden kan du vælge et antal billeder og generere en billedvæg.</p>
+
+        <p>
+          Vælg de billeder, du vil have med i filen, og tryk på knappen nederst for at få
+          din billedvægs-fil
+        </p>
+
+        <p>
+          Systemet prøver at "gætte" på folks oplysninger, hvis filerne er navngivet efter
+          formen <code>NAVN_STILLING_SUPPLERENDE.jpg</code>, hvor <code>STILLING</code> er
+          en af følgende:
+        </p>
+
+        <table>
+        {{ range $pos := .Positions }} 
+        <tr>
+          <td><code>{{$pos.Abbr}}</code></td><td> = </td><td>{{$pos.Title}}</td>
+        </tr>
+        {{ end }}
+        </table>
+
+        <p>
+          og <code>SUPPLERENDE</code> for yngre læger er deres vejleders navn/initialer og
+          for speciallæger er subspeciale. Ønskes andet end vejlederen for yngre læger,
+          kan der vinges af i <code>special</code>-checkboxen, så der ikke tilføjes
+          teksten "Vejleder: " forrest i feltet, når PDF'en laves.
+        </p>
+
+        <p>
+          Hvis filerne er navngivet anderledes, kan det rettes til i formularen, der
+          dukker op.
+        </p>
+
+        <p>
+          Man skal være opmærksom på "specielle" tegn (fx æ, ø, å, ü, ä mv.), som er
+          blevet udledt af filnavnet - de kan evt. give vanskeligheder i den genererede
+          PDF, selvom de umiddelbart vises korrekt i formularen. Her kan det hjælp at
+          skrive det manuelt i formularen.
+        </p>
+
+        <form action="/" method="POST" enctype="multipart/form-data">
+          <input
+            type="file"
+            name="file"
+            multiple="multiple"
+            accept="image/*"
+            onchange="load(this)"
+          />
+          <br />
+          <input type="checkbox" name="special" id="special" />
+          <label for="special">Speciallæger?</label>
+          <div id="images"></div>
+          <input id="submit" type="submit" value="Lav billedvæg" />
+        </form>
+      </div>
+      <footer>
+        <p>
+          Lavet af læge Sigurd Morsby Larsen, uddannelseskoordinerende yngre læge,
+          Neurologi, Aarhus Universitetshospital
+        </p>
+      </footer>
+    </div>
+  </body>
+  <script  src="scripts.js"></script>
+</html>

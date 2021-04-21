@@ -48,6 +48,8 @@ func cropImage(filepath string) (string, error) {
 	return newFile, nil
 }
 
+var positions = billedvaeg.Positions{}.FromJSON().ToMap()
+
 // ReadDir reads a dir and takes all images in it, converts them to a
 // []Person
 func ReadDir(dir string, special bool, formValues map[string][]string) (*billedvaeg.PersonList, error) {
@@ -83,9 +85,9 @@ func ReadDir(dir string, special bool, formValues map[string][]string) (*billedv
 
 		var position billedvaeg.Position
 		if v, ok := formValues[file.Name()+"-position"]; ok {
-			position = billedvaeg.Positions[v[0]]
+			position = positions[v[0]]
 		} else {
-			position = billedvaeg.Positions[data[1]]
+			position = positions[data[1]]
 		}
 
 		suppl := ""

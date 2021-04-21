@@ -17,8 +17,8 @@ import (
 
 func Serve(port int) {
 	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler).Methods("GET")
 	r.HandleFunc("/", UploadHandler).Methods("POST")
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("web/dist"))).Methods("GET")
 	http.Handle("/", r)
 
 	srv := &http.Server{
@@ -29,10 +29,6 @@ func Serve(port int) {
 		ReadTimeout:  15 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
-}
-
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "web/index.html")
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
