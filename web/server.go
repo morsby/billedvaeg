@@ -124,6 +124,5 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	_ = doc.OutputFileAndClose("tmp/pdf.pdf")
-	http.ServeFile(w, r, "tmp/pdf.pdf")
+	_ = doc.Output(w)
 }
