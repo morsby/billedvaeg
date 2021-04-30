@@ -18,7 +18,7 @@ import (
 func Serve(port int) {
 	r := mux.NewRouter()
 	r.HandleFunc("/", UploadHandler).Methods("POST")
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("web/dist"))).Methods("GET")
+	r.HandleFunc("/", Get).Methods("GET")
 	http.Handle("/", r)
 
 	srv := &http.Server{
@@ -29,6 +29,10 @@ func Serve(port int) {
 		ReadTimeout:  15 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
+}
+
+func Get(w http.ResponseWriter, r *http.Request) {
+	Compile(w)
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -120,6 +124,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	err = doc.OutputFileAndClose("tmp/pdf.pdf")
+	_ = doc.OutputFileAndClose("tmp/pdf.pdf")
 	http.ServeFile(w, r, "tmp/pdf.pdf")
 }
