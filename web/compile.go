@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/evanw/esbuild/pkg/api"
-	billedvaeg "github.com/morsby/billedvaeg/api"
+	"github.com/morsby/billedvaeg"
 )
 
 func Compile(w io.Writer) {
