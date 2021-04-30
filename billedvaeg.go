@@ -1,6 +1,7 @@
 package billedvaeg
 
 import (
+	_ "embed"
 	"encoding/json"
 	"sort"
 )
@@ -46,22 +47,14 @@ type Position struct {
 
 type Positions []*Position
 
-var PositionsJson string = `[
-		{ "title": "Ledende overlæge", "abbr": "LO" },
-		{ "title": "Overlæge, professor", "abbr": "OL-Pro" },
-		{ "title": "Uddannelsesansvarlig overlæge", "abbr": "UAO" },
-		{ "title": "Overlæge", "abbr": "OL" },
-		{ "title": "Afdelingslæge", "abbr": "AL" },
-		{ "title": "HU Neurologi", "abbr": "HU" },
-		{ "title": "Introduktionslæge", "abbr": "I" },
-		{ "title": "HU Psykiatri", "abbr": "Ps" }
-	  ]`
+//go:embed positions.json
+var PositionsJson []byte
 
 func (ps Positions) FromJSON() Positions {
 
 	var positions Positions
 
-	json.Unmarshal([]byte(PositionsJson), &positions)
+	json.Unmarshal(PositionsJson, &positions)
 	for n, p := range positions {
 		p.Value = n
 	}

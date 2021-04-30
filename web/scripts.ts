@@ -1,4 +1,4 @@
-const positions = [];
+import positions from "../positions.json";
 // elem = element to create
 // html = tag's html contents
 // tags = [["attribute", "value"], ...]
