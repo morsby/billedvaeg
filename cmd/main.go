@@ -1,11 +1,9 @@
 package main
 
 import (
-	"os"
-
 	"github.com/morsby/billedvaeg/web"
 )
 
 func main() {
-	web.Compile(os.Stdout)
+	web.Serve(3000)
 }
