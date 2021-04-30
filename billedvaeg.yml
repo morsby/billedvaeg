@@ -1,0 +1,14 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://faasd.morsby.dk
+functions:
+  billedvaeg:
+    lang: golang-http
+    handler: ./billedvaeg
+    image: morsby/billedvaeg:latest
+    build_args:
+      GO111MODULE: on
+      TARGETOS: linux
+      TARGETARCH: amd64
+      TARGETPLATFORM: linux/amd64

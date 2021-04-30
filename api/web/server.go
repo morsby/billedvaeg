@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/morsby/billedvaeg/images"
-	"github.com/morsby/billedvaeg/pdf"
+	"github.com/morsby/billedvaeg/api/images"
+	"github.com/morsby/billedvaeg/api/pdf"
 )
 
 func Serve(port int) {

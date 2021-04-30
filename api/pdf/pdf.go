@@ -3,7 +3,7 @@ package pdf
 import (
 	"strings"
 
-	"github.com/morsby/billedvaeg"
+	billedvaeg "github.com/morsby/billedvaeg/api"
 	"github.com/phpdave11/gofpdf"
 )
 

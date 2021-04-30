@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/morsby/billedvaeg"
+	billedvaeg "github.com/morsby/billedvaeg/api"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )

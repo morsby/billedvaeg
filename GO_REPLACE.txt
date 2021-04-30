@@ -1,0 +1,2 @@
+replace github.com/morsby/billedvaeg/api => ./function/api
+replace github.com/morsby/billedvaeg/api/web => ./function/api/web

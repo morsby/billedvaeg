@@ -1,4 +1,4 @@
-package billedvaeg
+package api
 
 import (
 	"encoding/json"
