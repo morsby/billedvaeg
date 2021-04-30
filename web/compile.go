@@ -9,9 +9,9 @@ import (
 	"github.com/morsby/billedvaeg"
 )
 
-func Compile(w io.Writer) {
+func Compile(w io.Writer) error {
 	script := genScripts()
-	genIndexPage(w, string(script))
+	return genIndexPage(w, string(script))
 }
 
 type pageData struct {
@@ -19,14 +19,14 @@ type pageData struct {
 	Script    template.JS
 }
 
-func genIndexPage(w io.Writer, script string) {
+func genIndexPage(w io.Writer, script string) error {
 	tpl := template.Must(template.ParseFiles("web/index.gohtml"))
 	data := pageData{
 		Positions: billedvaeg.Positions{}.FromJSON(),
 		Script:    template.JS(script),
 	}
 
-	tpl.Execute(w, data)
+	return tpl.Execute(w, data)
 }
 
 func genScripts() []byte {
