@@ -2,7 +2,6 @@ package billedvaeg
 
 import (
 	"encoding/json"
-	"os"
 	"sort"
 )
 
@@ -47,15 +46,22 @@ type Position struct {
 
 type Positions []*Position
 
+var PositionsJson string = `[
+		{ "title": "Ledende overlæge", "abbr": "LO" },
+		{ "title": "Overlæge, professor", "abbr": "OL-Pro" },
+		{ "title": "Uddannelsesansvarlig overlæge", "abbr": "UAO" },
+		{ "title": "Overlæge", "abbr": "OL" },
+		{ "title": "Afdelingslæge", "abbr": "AL" },
+		{ "title": "HU Neurologi", "abbr": "HU" },
+		{ "title": "Introduktionslæge", "abbr": "I" },
+		{ "title": "HU Psykiatri", "abbr": "Ps" }
+	  ]`
+
 func (ps Positions) FromJSON() Positions {
-	bytes, err := os.ReadFile("positions.json")
-	if err != nil {
-		panic(err)
-	}
 
 	var positions Positions
 
-	json.Unmarshal(bytes, &positions)
+	json.Unmarshal([]byte(PositionsJson), &positions)
 	for n, p := range positions {
 		p.Value = n
 	}
