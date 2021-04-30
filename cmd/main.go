@@ -25,22 +25,22 @@ type pageData struct {
 func genIndexPage() {
 	tpl := template.Must(template.ParseFiles("web/index.gohtml"))
 
-	err := os.MkdirAll("web/dist", 777)
+	err := os.MkdirAll("web/dist", 0777)
 	if err != nil {
 		panic(err)
 	}
 
 	f, err := os.Create("web/dist/index.html")
-	defer f.Close()
 	if err != nil {
 		panic(err)
 	}
+	defer f.Close()
+
 	data := pageData{
 		Positions: billedvaeg.Positions{}.FromJSON(),
 	}
 
 	tpl.Execute(f, data)
-	return
 }
 
 func genScripts() {
