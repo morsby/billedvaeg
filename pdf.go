@@ -1,9 +1,8 @@
-package pdf
+package billedvaeg
 
 import (
 	"strings"
 
-	"github.com/morsby/billedvaeg"
 	"github.com/phpdave11/gofpdf"
 )
 
@@ -17,7 +16,7 @@ func New() *gofpdf.Fpdf {
 	return pdf
 }
 
-func AddPeople(pdf *gofpdf.Fpdf, people billedvaeg.PersonList, cols int) {
+func AddPeople(pdf *gofpdf.Fpdf, people PersonList, cols int) {
 	rows := 3
 	pplPerPage := rows * cols
 	var cellWidth = (210-margin*2)/float64(cols) - cellspacing

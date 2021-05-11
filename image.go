@@ -1,4 +1,4 @@
-package images
+package billedvaeg
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/morsby/billedvaeg"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
@@ -48,12 +47,12 @@ func cropImage(filepath string) (string, error) {
 	return newFile, nil
 }
 
-var positions = billedvaeg.Positions{}.FromJSON().ToMap()
+var positions = Positions{}.FromJSON().ToMap()
 
 // ReadDir reads a dir and takes all images in it, converts them to a
 // []Person
-func ReadDir(dir string, special bool, formValues map[string][]string) (*billedvaeg.PersonList, error) {
-	var ppl billedvaeg.PersonList
+func ReadDir(dir string, special bool, formValues map[string][]string) (*PersonList, error) {
+	var ppl PersonList
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -83,7 +82,7 @@ func ReadDir(dir string, special bool, formValues map[string][]string) (*billedv
 			name = data[0]
 		}
 
-		var position billedvaeg.Position
+		var position Position
 		if v, ok := formValues[file.Name()+"-position"]; ok {
 			position = positions[v[0]]
 		} else {
@@ -100,7 +99,7 @@ func ReadDir(dir string, special bool, formValues map[string][]string) (*billedv
 			suppl = fmt.Sprintf("Vejleder: %s", suppl)
 		}
 
-		person := billedvaeg.Person{
+		person := Person{
 			Name:     name,
 			Position: position,
 			Suppl:    suppl,

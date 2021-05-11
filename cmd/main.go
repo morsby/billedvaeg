@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/morsby/billedvaeg/web"
-)
+import "github.com/morsby/billedvaeg"
 
 func main() {
-	web.Serve(3000)
+	billedvaeg.Serve(3000)
 }

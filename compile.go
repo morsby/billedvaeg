@@ -1,4 +1,4 @@
-package web
+package billedvaeg
 
 import (
 	_ "embed"
@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/evanw/esbuild/pkg/api"
-	"github.com/morsby/billedvaeg"
 )
 
 func Compile(w io.Writer) error {
@@ -18,28 +17,28 @@ func Compile(w io.Writer) error {
 }
 
 type pageData struct {
-	Positions billedvaeg.Positions
+	Positions Positions
 	Script    template.JS
 }
 
-//go:embed index.gohtml
+//go:embed web/index.gohtml
 var tmpl string
 
 func genIndexPage(w io.Writer, script string) error {
 	tpl := template.Must(template.New("index").Parse(tmpl))
 	data := pageData{
-		Positions: billedvaeg.Positions{}.FromJSON(),
+		Positions: Positions{}.FromJSON(),
 		Script:    template.JS(script),
 	}
 
 	return tpl.Execute(w, data)
 }
 
-//go:embed scripts.ts
+//go:embed web/scripts.ts
 var script string
 
 func genScripts() []byte {
-	script = strings.Replace(script, `import positions from "../positions.json";`, fmt.Sprintf("const positions = %s", billedvaeg.PositionsJson), -1)
+	script = strings.Replace(script, `import positions from "../positions.json";`, fmt.Sprintf("const positions = %s", PositionsJson), -1)
 
 	result := api.Build(api.BuildOptions{
 		Stdin: &api.StdinOptions{
