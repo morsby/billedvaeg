@@ -1,6 +1,7 @@
 package billedvaeg
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/phpdave11/gofpdf"
@@ -16,12 +17,12 @@ func New() *gofpdf.Fpdf {
 	return pdf
 }
 
-func AddPeople(pdf *gofpdf.Fpdf, people PersonList, cols int) {
+func AddPeople(pdf *gofpdf.Fpdf, people *PersonList, cols int) {
 	rows := 3
 	pplPerPage := rows * cols
 	var cellWidth = (210-margin*2)/float64(cols) - cellspacing
 
-	for n, p := range people {
+	for n, p := range *people {
 		if n%pplPerPage == 0 {
 			pdf.AddPage()
 		}
@@ -32,11 +33,15 @@ func AddPeople(pdf *gofpdf.Fpdf, people PersonList, cols int) {
 
 		y := margin + float64(n%pplPerPage/cols*85)
 		pdf.SetY(y)
-
-		img := pdf.RegisterImageOptions(p.Img, gofpdf.ImageOptions{})
+		imgName := fmt.Sprintf("img-%s", strings.ReplaceAll(p.Name, " ", "-"))
+		cImg, err := cropImage(&p.Img)
+		if err != nil {
+			panic(err)
+		}
+		img := pdf.RegisterImageOptionsReader(imgName, gofpdf.ImageOptions{ImageType: "JPEG"}, cImg)
 		w := img.Width() / (img.Height() / 60)
 
-		pdf.ImageOptions(p.Img, x+(cellWidth-w)/2, y, 0, 60, false, gofpdf.ImageOptions{}, 0, "")
+		pdf.ImageOptions(imgName, x+(cellWidth-w)/2, y, 0, 60, false, gofpdf.ImageOptions{}, 0, "")
 		pdf.Ln(60)
 
 		addTextLine(pdf, p.Name, x, cellWidth)

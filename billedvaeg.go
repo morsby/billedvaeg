@@ -1,29 +1,33 @@
+/* Package billedvaeg contains an api to allow for creation of a PDF document
+** of A4-sized pages, containing a number of images of Doctors, their names,
+** positions and some supplementary information
+ */
 package billedvaeg
 
 import (
+	"bytes"
 	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path"
 	"sort"
-	"strings"
-	"time"
 )
 
 // Person contains information on a doctor
 type Person struct {
 	Name     string
-	Position Position
+	Position *Position
 	Suppl    string
-	Img      string
+	Img      bytes.Buffer
 }
 
+// PersonList contains a slice of *Person
 type PersonList []*Person
 
+// Sort sorts a PersonList by positions - and if they're equal,
+// by name
 func (ppl PersonList) Sort() {
 	sort.Slice(ppl, func(i, j int) bool {
 		// Same positions, sort by name instead
@@ -36,80 +40,54 @@ func (ppl PersonList) Sort() {
 	})
 }
 
-const (
-	LO = iota
-	OLPro
-	UAO
-	OL
-	AL
-	HU
-	I
-	Ps
-)
-
+// Position contains information on a position
 type Position struct {
 	Title string
 	Abbr  string
 	Value int
 }
 
-type Positions []*Position
+// PositionList contains a slice of *Position
+type PositionList []*Position
 
-//go:embed positions.json
-var PositionsJson []byte
+// Positions contains the positions, unmarshalled from `positions.json`
+var Positions PositionList
 
-func (ps Positions) FromJSON() Positions {
+//go:embed embeds/positions.json
+var positionsJson []byte
 
-	var positions Positions
-
-	json.Unmarshal(PositionsJson, &positions)
-	for n, p := range positions {
+func init() {
+	json.Unmarshal(positionsJson, &Positions)
+	for n, p := range Positions {
 		p.Value = n
 	}
-	return positions
 }
 
-func (ps Positions) ToMap() map[string]Position {
-	m := make(map[string]Position)
-	for _, p := range ps {
-		m[p.Abbr] = *p
+// ToMap converts a PositionstList (a slice) into a map,
+// where the key is the position's 'abbr' (abbreviation).
+func (pl PositionList) ToMap() map[string]*Position {
+	m := make(map[string]*Position)
+	for _, p := range pl {
+		m[p.Abbr] = p
 	}
 	return m
 }
 
-type FormOptions struct {
-	MAX_UPLOAD_SIZE int64
-	Specialists     bool
-}
-
-func HandleMultiformData(r *http.Request, opts FormOptions) (*PersonList, error) {
-	/* Upload files */
-
+// parseMultiformData parses a HTTP MultiFormData request, creating a PersonList
+// from it's information and returning the data.
+func parseMultiformData(r *http.Request) (*PersonList, error) {
 	// Get a reference to the fileHeaders.
 	// They are accessible only after ParseMultipartForm is called
 	files := r.MultipartForm.File["file"]
-	timestamp := fmt.Sprintf("%d", time.Now().UnixNano())
-	imgFolder := path.Join(os.TempDir(), timestamp)
-	err := os.MkdirAll(imgFolder, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, fileHeader := range files {
-		// Restrict the size of each uploaded file to 1MB.
-		// To prevent the aggregate size from exceeding
-		// a specified value, use the http.MaxBytesReader() method
-		// before calling ParseMultipartForm()
-		if fileHeader.Size > opts.MAX_UPLOAD_SIZE {
-			return nil, errors.New("uploaded image is too big: %s")
-		}
-
+	updatedPpl := PersonList{}
+	var positions = Positions.ToMap()
+	for _, file := range files {
 		// Open the file
-		uploadedFile, err := fileHeader.Open()
+		uploadedFile, err := file.Open()
 		if err != nil {
 			return nil, err
 		}
-
+		// Detect content type:
 		buff := make([]byte, 512)
 		_, err = uploadedFile.Read(buff)
 		if err != nil {
@@ -121,24 +99,32 @@ func HandleMultiformData(r *http.Request, opts FormOptions) (*PersonList, error)
 			return nil, errors.New("provided file format is not allowed")
 		}
 
+		// Reset read position
 		_, err = uploadedFile.Seek(0, io.SeekStart)
 		if err != nil {
 			return nil, err
 		}
 
-		filenameWithLowercaseExt := strings.TrimSuffix(fileHeader.Filename, path.Ext(fileHeader.Filename)) + strings.ToLower(path.Ext(fileHeader.Filename))
-		tmpFile, err := os.Create(path.Join(imgFolder, filenameWithLowercaseExt))
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = io.Copy(tmpFile, uploadedFile)
-		if err != nil {
-			return nil, err
-		}
-
+		// Create a copy
+		img := bytes.Buffer{}
+		io.Copy(&img, uploadedFile)
 		uploadedFile.Close()
-		tmpFile.Close()
+
+		name := r.Form[file.Filename+"-name"][0]
+		position := positions[r.Form[file.Filename+"-position"][0]]
+		suppl := r.Form[file.Filename+"-suppl"][0]
+		// If not a specialist position:
+		if position.Value >= Positions.ToMap()["HU"].Value {
+			suppl = fmt.Sprintf("Vejleder: %s", suppl)
+		}
+
+		updatedPpl = append(updatedPpl, &Person{
+			Name:     name,
+			Position: position,
+			Suppl:    suppl,
+			Img:      img,
+		})
+
 	}
-	return ReadDir(imgFolder, opts.Specialists, r.MultipartForm.Value)
+	return &updatedPpl, nil
 }
