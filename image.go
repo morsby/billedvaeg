@@ -9,9 +9,7 @@ import (
 	"github.com/oliamb/cutter"
 )
 
-// cropImage opens an image, crops it to 3x4 format and
-// saves it in the same location with the suffix and
-// extension "_cropped.jpg" in the same folder.
+// cropImage opens an image, crops it to 3x4 format
 func cropImage(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	img, _, err := image.Decode(buf)
 	if err != nil {

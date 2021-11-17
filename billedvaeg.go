@@ -6,12 +6,6 @@ package billedvaeg
 
 import (
 	"bytes"
-	_ "embed"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"net/http"
 	"sort"
 )
 
@@ -20,24 +14,24 @@ type Person struct {
 	Name     string
 	Position *Position
 	Suppl    string
-	Img      bytes.Buffer
+	Img      *bytes.Buffer
 }
 
-// PersonList contains a slice of *Person
-type PersonList []*Person
-
-// Sort sorts a PersonList by positions - and if they're equal,
+// SortPersons sorts a slice of persons by positions - and if they're equal,
 // by name
-func (ppl PersonList) Sort() {
-	sort.Slice(ppl, func(i, j int) bool {
+func SortPersons(ppl []*Person) []*Person {
+	list := make([]*Person, len(ppl))
+	copy(list, ppl)
+	sort.Slice(list, func(i, j int) bool {
 		// Same positions, sort by name instead
-		if ppl[i].Position.Value == ppl[j].Position.Value {
-			return ppl[i].Name < ppl[j].Name
+		if list[i].Position.Value == list[j].Position.Value {
+			return list[i].Name < list[j].Name
 		}
 
 		// sort by name
-		return ppl[i].Position.Value < ppl[j].Position.Value
+		return list[i].Position.Value < list[j].Position.Value
 	})
+	return list
 }
 
 // Position contains information on a position
@@ -47,35 +41,19 @@ type Position struct {
 	Value int
 }
 
-// PositionList contains a slice of *Position
-type PositionList []*Position
-
-// Positions contains the positions, unmarshalled from `positions.json`
-var Positions PositionList
-
-//go:embed embeds/positions.json
-var positionsJson []byte
-
-func init() {
-	json.Unmarshal(positionsJson, &Positions)
-	for n, p := range Positions {
-		p.Value = n
-	}
-}
-
-// ToMap converts a PositionstList (a slice) into a map,
+/*// PositionsToMap converts a slice of positions into a map,
 // where the key is the position's 'abbr' (abbreviation).
-func (pl PositionList) ToMap() map[string]*Position {
+func PositionsToMap(pl []*Position) map[string]*Position {
 	m := make(map[string]*Position)
 	for _, p := range pl {
 		m[p.Abbr] = p
 	}
 	return m
-}
+}*/
 
-// parseMultiformData parses a HTTP MultiFormData request, creating a PersonList
+/*// parseMultiformData parses a HTTP MultiFormData request, creating a PersonList
 // from it's information and returning the data.
-func parseMultiformData(r *http.Request) (*PersonList, error) {
+func parseMultiformData(r *http.Request) (*[]*Person, error) {
 	// Get a reference to the fileHeaders.
 	// They are accessible only after ParseMultipartForm is called
 	files := r.MultipartForm.File["file"]
@@ -127,4 +105,4 @@ func parseMultiformData(r *http.Request) (*PersonList, error) {
 
 	}
 	return &updatedPpl, nil
-}
+}*/
