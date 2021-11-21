@@ -6,15 +6,78 @@ package billedvaeg
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
+	"io"
+	"os"
 	"sort"
 )
 
 // Person contains information on a doctor
 type Person struct {
-	Name     string
-	Position *Position
-	Suppl    string
-	Img      *bytes.Buffer
+	Name     string        `json:"name"`
+	Position int           `json:"position"`
+	Suppl    string        `json:"suppl"`
+	Img      *bytes.Buffer `json:"img"`
+}
+
+type personJson struct {
+	Name     string `json:"name"`
+	Position int    `json:"position"`
+	Suppl    string `json:"suppl"`
+	Img      string `json:"img"`
+}
+
+func (p *Person) UnmarshalJSON(data []byte) error {
+	tmp := personJson{}
+	err := json.Unmarshal(data, &tmp)
+	if err != nil {
+		return err
+	}
+
+	p.Name = tmp.Name
+	p.Position = tmp.Position
+	p.Suppl = tmp.Suppl
+	if tmp.Img != "" {
+		err := p.ImageFromBase64(tmp.Img)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ImageFromReader sets the person's image from the provided io.Reader.
+func (p *Person) ImageFromReader(r io.Reader) error {
+	buf := bytes.Buffer{}
+	buf.ReadFrom(r)
+	p.Img = &buf
+	return nil
+}
+
+// ImageFromFile sets the person's image by loading the image at the provided path.
+func (p *Person) ImageFromFile(path string) error {
+	img, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer img.Close()
+	p.ImageFromReader(img)
+	return nil
+}
+
+// ImageFromBase64 sets the person's image by parsing a base64-encoded image passed as
+// a string parameter.
+func (p *Person) ImageFromBase64(ImgBase64 string) error {
+	// decode base64 encoded image into a buffer
+	img, err := base64.StdEncoding.DecodeString(ImgBase64)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer([]byte(img))
+	p.Img = buf
+	return nil
 }
 
 // SortPersons sorts a slice of persons by positions - and if they're equal,
@@ -24,85 +87,19 @@ func SortPersons(ppl []*Person) []*Person {
 	copy(list, ppl)
 	sort.Slice(list, func(i, j int) bool {
 		// Same positions, sort by name instead
-		if list[i].Position.Value == list[j].Position.Value {
+		if list[i].Position == list[j].Position {
 			return list[i].Name < list[j].Name
 		}
 
-		// sort by name
-		return list[i].Position.Value < list[j].Position.Value
+		// sort by position
+		return list[i].Position < list[j].Position
 	})
 	return list
 }
 
 // Position contains information on a position
 type Position struct {
-	Title string
-	Abbr  string
-	Value int
+	Title string `json:"title"`
+	Abbr  string `json:"abbr"`
+	Value int    `json:"value"`
 }
-
-/*// PositionsToMap converts a slice of positions into a map,
-// where the key is the position's 'abbr' (abbreviation).
-func PositionsToMap(pl []*Position) map[string]*Position {
-	m := make(map[string]*Position)
-	for _, p := range pl {
-		m[p.Abbr] = p
-	}
-	return m
-}*/
-
-/*// parseMultiformData parses a HTTP MultiFormData request, creating a PersonList
-// from it's information and returning the data.
-func parseMultiformData(r *http.Request) (*[]*Person, error) {
-	// Get a reference to the fileHeaders.
-	// They are accessible only after ParseMultipartForm is called
-	files := r.MultipartForm.File["file"]
-	updatedPpl := PersonList{}
-	var positions = Positions.ToMap()
-	for _, file := range files {
-		// Open the file
-		uploadedFile, err := file.Open()
-		if err != nil {
-			return nil, err
-		}
-		// Detect content type:
-		buff := make([]byte, 512)
-		_, err = uploadedFile.Read(buff)
-		if err != nil {
-			return nil, err
-		}
-
-		filetype := http.DetectContentType(buff)
-		if filetype != "image/jpeg" && filetype != "image/png" {
-			return nil, errors.New("provided file format is not allowed")
-		}
-
-		// Reset read position
-		_, err = uploadedFile.Seek(0, io.SeekStart)
-		if err != nil {
-			return nil, err
-		}
-
-		// Create a copy
-		img := bytes.Buffer{}
-		io.Copy(&img, uploadedFile)
-		uploadedFile.Close()
-
-		name := r.Form[file.Filename+"-name"][0]
-		position := positions[r.Form[file.Filename+"-position"][0]]
-		suppl := r.Form[file.Filename+"-suppl"][0]
-		// If not a specialist position:
-		if position.Value >= Positions.ToMap()["HU"].Value {
-			suppl = fmt.Sprintf("Vejleder: %s", suppl)
-		}
-
-		updatedPpl = append(updatedPpl, &Person{
-			Name:     name,
-			Position: position,
-			Suppl:    suppl,
-			Img:      img,
-		})
-
-	}
-	return &updatedPpl, nil
-}*/

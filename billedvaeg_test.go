@@ -11,9 +11,9 @@ func TestSortPersons(t *testing.T) {
 		output []*Person
 	}
 
-	pos1nameA := &Person{Name: "A", Position: &Position{Value: 1}}
-	pos1nameB := &Person{Name: "B", Position: &Position{Value: 1}}
-	pos2nameA := &Person{Name: "A", Position: &Position{Value: 2}}
+	pos1nameA := &Person{Name: "A", Position: 1}
+	pos1nameB := &Person{Name: "B", Position: 1}
+	pos2nameA := &Person{Name: "A", Position: 2}
 
 	ts := []expect{
 		{[]*Person{pos1nameA, pos1nameB}, []*Person{pos1nameA, pos1nameB}},
