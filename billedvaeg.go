@@ -13,6 +13,11 @@ import (
 	"sort"
 )
 
+type JSONInput struct {
+	Positions []*Position `json:"positions"`
+	People    []*Person   `json:"people"`
+}
+
 // Person contains information on a doctor
 type Person struct {
 	Name     string        `json:"name"`
@@ -22,10 +27,15 @@ type Person struct {
 }
 
 type personJson struct {
-	Name     string `json:"name"`
-	Position int    `json:"position"`
-	Suppl    string `json:"suppl"`
-	Img      string `json:"img"`
+	Name     string     `json:"name"`
+	Position int        `json:"position"`
+	Suppl    string     `json:"suppl"`
+	Img      *base64Img `json:"img"`
+}
+
+type base64Img struct {
+	MIME string `json:"mime"`
+	Data string `json:"data"`
 }
 
 func (p *Person) UnmarshalJSON(data []byte) error {
@@ -38,8 +48,8 @@ func (p *Person) UnmarshalJSON(data []byte) error {
 	p.Name = tmp.Name
 	p.Position = tmp.Position
 	p.Suppl = tmp.Suppl
-	if tmp.Img != "" {
-		err := p.ImageFromBase64(tmp.Img)
+	if tmp.Img != nil {
+		err := p.ImageFromBase64(tmp.Img.Data)
 		if err != nil {
 			return err
 		}
