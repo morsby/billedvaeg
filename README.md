@@ -2,4 +2,4 @@
 
 ## When developing
 
-`reflex -s -r "^*.go|gohtml|ts|json$" go run cmd/main.go`
+`reflex -s -r "^*.go$" go run cmd/main.go`

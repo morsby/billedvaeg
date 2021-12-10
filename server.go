@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // Server starts a server listening in PORT.
@@ -23,17 +24,21 @@ func Server(port int, wait time.Duration) {
 	r.HandleFunc("/", get).Methods("GET")
 	// Add your routes as needed
 
+	// allow CORS
+	handler := cors.Default().Handler(r)
+
 	srv := &http.Server{
 		Addr: fmt.Sprintf("0.0.0.0:%d", port),
 		// Good practice to set timeouts to avoid Slowloris attacks.
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r, // Pass our instance of gorilla/mux in.
+		Handler:      handler, // Pass our instance of gorilla/mux in.
 	}
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
+		fmt.Printf("Server listening on http://%s\n", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
