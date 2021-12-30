@@ -11,9 +11,9 @@ func TestSortPersons(t *testing.T) {
 		output []*Person
 	}
 
-	pos1nameA := &Person{Name: "A", Position: 1}
-	pos1nameB := &Person{Name: "B", Position: 1}
-	pos2nameA := &Person{Name: "A", Position: 2}
+	pos1nameA := &Person{Name: "A", PositionOrder: 1}
+	pos1nameB := &Person{Name: "B", PositionOrder: 1}
+	pos2nameA := &Person{Name: "A", PositionOrder: 2}
 
 	ts := []expect{
 		{[]*Person{pos1nameA, pos1nameB}, []*Person{pos1nameA, pos1nameB}},
@@ -22,7 +22,7 @@ func TestSortPersons(t *testing.T) {
 	}
 
 	for _, v := range ts {
-		x := SortPersons(v.input)
+		x := SortPersons(v.input, true)
 		if !reflect.DeepEqual(x, v.output) {
 			t.Errorf("Input: %v, got: %v; wanted: %v", v.input, x, v.output)
 		}

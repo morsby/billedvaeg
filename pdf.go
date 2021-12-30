@@ -23,7 +23,7 @@ var cellspacing = 5.0
 type Document struct {
 	PDF       *gofpdf.Fpdf
 	People    []*Person
-	Positions []*Position
+	Positions map[int]*Position
 	Cols      int
 	Rows      int
 }
@@ -48,7 +48,8 @@ var placeholderFile embed.FS
 func (doc Document) Generate(sort bool) error {
 	people := doc.People
 	if sort {
-		people = SortPersons(doc.People)
+		// sort people by position > name
+		people = SortPersons(doc.People, true)
 	}
 
 	pplPerPage := doc.Rows * doc.Cols
@@ -89,7 +90,7 @@ func (doc Document) Generate(sort bool) error {
 		doc.PDF.Ln(60)
 
 		doc.addTextLine(p.Name, x, cellWidth)
-		doc.addTextLine(doc.Positions[p.Position].Title, x, cellWidth)
+		doc.addTextLine(doc.Positions[p.PositionID].Title, x, cellWidth)
 		doc.addTextLine(p.Suppl, x, cellWidth)
 	}
 	return nil

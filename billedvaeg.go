@@ -21,17 +21,18 @@ type JSONInput struct {
 
 // Person contains information on a doctor
 type Person struct {
-	Name     string        `json:"name"`
-	Position int           `json:"position"`
-	Suppl    string        `json:"suppl"`
-	Img      *bytes.Buffer `json:"img"`
+	id            int           `json:"id"`
+	Name          string        `json:"name"`
+	PositionID    int           `json:"positionId"`
+	PositionOrder int           `json:"positionOrder"`
+	Suppl         string        `json:"suppl"`
+	Img           *bytes.Buffer `json:"img"`
+	Order         int           `json:"order"`
 }
 
 type personJson struct {
-	Name     string     `json:"name"`
-	Position int        `json:"position"`
-	Suppl    string     `json:"suppl"`
-	Img      *base64Img `json:"img"`
+	Person
+	Img *base64Img `json:"img"`
 }
 
 type base64Img struct {
@@ -47,7 +48,7 @@ func (p *Person) UnmarshalJSON(data []byte) error {
 	}
 
 	p.Name = tmp.Name
-	p.Position = tmp.Position
+	p.PositionID = tmp.PositionID
 	p.Suppl = tmp.Suppl
 	if tmp.Img != nil {
 		err := p.ImageFromBase64(tmp.Img.Data)
@@ -93,24 +94,30 @@ func (p *Person) ImageFromBase64(ImgBase64 string) error {
 
 // SortPersons sorts a slice of persons by positions - and if they're equal,
 // by name
-func SortPersons(ppl []*Person) []*Person {
+func SortPersons(ppl []*Person, auto bool) []*Person {
 	list := make([]*Person, len(ppl))
 	copy(list, ppl)
 	sort.Slice(list, func(i, j int) bool {
-		// Same positions, sort by name instead
-		if list[i].Position == list[j].Position {
-			return list[i].Name < list[j].Name
+		if auto {
+			// Same positions, sort by name instead
+			if list[i].PositionOrder == list[j].PositionOrder {
+				return list[i].Name < list[j].Name
+			}
+
+			// sort by position
+			return list[i].PositionOrder < list[j].PositionOrder
+		} else {
+			return list[i].Order < list[j].Order
 		}
 
-		// sort by position
-		return list[i].Position < list[j].Position
 	})
 	return list
 }
 
 // Position contains information on a position
 type Position struct {
+	ID    int    `json:"id"`
 	Title string `json:"title"`
 	Abbr  string `json:"abbr"`
-	Value int    `json:"value"`
+	Order int    `json:"order"`
 }

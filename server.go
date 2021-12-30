@@ -80,7 +80,11 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 	doc := New()
 	doc.People = input.People
-	doc.Positions = input.Positions
+	positions := make(map[int]*Position)
+	for _, pos := range input.Positions {
+		positions[pos.ID] = pos
+	}
+	doc.Positions = positions
 	err = doc.Generate(input.Sort)
 	if err != nil {
 		panic(err)
