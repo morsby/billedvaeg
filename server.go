@@ -81,7 +81,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 	doc := New()
 	doc.People = input.People
 	doc.Positions = input.Positions
-	err = doc.Generate(true)
+	err = doc.Generate(input.Sort)
 	if err != nil {
 		panic(err)
 	}

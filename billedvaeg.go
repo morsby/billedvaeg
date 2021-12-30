@@ -16,6 +16,7 @@ import (
 type JSONInput struct {
 	Positions []*Position `json:"positions"`
 	People    []*Person   `json:"people"`
+	Sort      bool        `json:"sort"`
 }
 
 // Person contains information on a doctor
