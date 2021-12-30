@@ -21,7 +21,7 @@ type JSONInput struct {
 
 // Person contains information on a doctor
 type Person struct {
-	id            int           `json:"id"`
+	ID            int           `json:"id"`
 	Name          string        `json:"name"`
 	PositionID    int           `json:"positionId"`
 	PositionOrder int           `json:"positionOrder"`
