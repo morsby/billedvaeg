@@ -24,15 +24,20 @@ type Person struct {
 	ID            int           `json:"id"`
 	Name          string        `json:"name"`
 	PositionID    int           `json:"positionId"`
-	PositionOrder int           `json:"positionOrder"`
+	PositionOrder int           `json:"position"`
 	Suppl         string        `json:"suppl"`
 	Img           *bytes.Buffer `json:"img"`
 	Order         int           `json:"order"`
 }
 
 type personJson struct {
-	Person
-	Img *base64Img `json:"img"`
+	ID            int        `json:"id"`
+	Name          string     `json:"name"`
+	PositionID    int        `json:"positionId"`
+	PositionOrder int        `json:"position"`
+	Suppl         string     `json:"suppl"`
+	Order         int        `json:"order"`
+	Img           *base64Img `json:"img"`
 }
 
 type base64Img struct {
@@ -47,9 +52,12 @@ func (p *Person) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	p.ID = tmp.ID
 	p.Name = tmp.Name
 	p.PositionID = tmp.PositionID
+	p.PositionOrder = tmp.PositionOrder
 	p.Suppl = tmp.Suppl
+	p.Order = tmp.Order
 	if tmp.Img != nil {
 		err := p.ImageFromBase64(tmp.Img.Data)
 		if err != nil {

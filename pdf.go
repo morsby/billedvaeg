@@ -49,7 +49,7 @@ func (doc Document) Generate(sort bool) error {
 	people := doc.People
 	if sort {
 		// sort people by position > name
-		people = SortPersons(doc.People, true)
+		people = SortPersons(doc.People, sort)
 	}
 
 	pplPerPage := doc.Rows * doc.Cols
