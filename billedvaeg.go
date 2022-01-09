@@ -26,7 +26,7 @@ type Person struct {
 	PositionID    int           `json:"positionId"`
 	PositionOrder int           `json:"position"`
 	Suppl         string        `json:"suppl"`
-	Img           *bytes.Buffer `json:"img"`
+	Img           *bytes.Buffer `json:"image"`
 	Order         int           `json:"order"`
 }
 
@@ -37,7 +37,7 @@ type personJson struct {
 	PositionOrder int        `json:"position"`
 	Suppl         string     `json:"suppl"`
 	Order         int        `json:"order"`
-	Img           *base64Img `json:"img"`
+	Img           *base64Img `json:"image"`
 }
 
 type base64Img struct {

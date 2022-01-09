@@ -86,10 +86,6 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 	doc.Positions = positions
 
-	for _, p := range input.People {
-		fmt.Printf("%+v\n", p)
-	}
-
 	err = doc.Generate(input.Sort)
 	if err != nil {
 		panic(err)
